@@ -29,7 +29,7 @@ resource "google_compute_instance" "master-server" {
 	sudo apt-get update
 	sudo apt-get install -y git default-jre tcpdump
 	git clone https://github.com/ojan208/skripsi-docker-server.git /home/skripsi-docker-server
-	sudo tcpdump -w /home/worker-2-captured_packets.pcap tcp &
+	sudo tcpdump -w /home/master-captured_packets.pcap tcp &
 	cd /home/skripsi-docker-server/master
 	nohup java -jar multipaper-master-2.12.3-all.jar &
 	EOF
@@ -40,7 +40,7 @@ variable "zones" {
 	default = [ 
 		"southeast2",
 		"south2",
-		"northeast1",
+		"southeast1",
 		"east1",
 	]
 }
@@ -76,7 +76,7 @@ resource "google_compute_instance" "worker-server" {
 	sudo apt-get update
 	sudo apt-get install -y git default-jre tcpdump
 	git clone https://github.com/ojan208/skripsi-docker-server.git /home/skripsi-docker-server
-	sudo tcpdump -w /home/worker-2-captured_packets.pcap tcp &
+	sudo tcpdump -w /home/${ each.key }-captured_packets.pcap tcp &
 	cd /home/skripsi-docker-server/worker 
 	chmod +x run_server.sh
 	nohup ./run_server.sh ${each.key} ${google_compute_instance.master-server.network_interface.0.network_ip}:35353 &
